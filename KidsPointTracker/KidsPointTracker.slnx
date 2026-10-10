@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="KidsPointTracker.Shared/KidsPointTracker.Shared.csproj" />
+  <Project Path="KidsPointTracker.Web/KidsPointTracker.Web.csproj" />
+</Solution>
