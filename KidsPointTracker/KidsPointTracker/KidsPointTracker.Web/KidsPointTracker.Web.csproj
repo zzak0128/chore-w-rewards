@@ -5,15 +5,12 @@
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
         <BlazorDisableThrowNavigationException>true</BlazorDisableThrowNavigationException>
-        <UserSecretsId>29c0f218-1221-4ec1-bd2c-e957708ec8b6</UserSecretsId>
+        <UserSecretsId>30b36b84-9a8e-40a8-adb4-b50ebea1adcf</UserSecretsId>
     </PropertyGroup>
 
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="11.0.0-rc.1.26425.128" />
         <PackageReference Include="MudBlazor" Version="9.*"/>
-        <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="9.0.0" />
-        <PackageReference Include="Pomelo.EntityFrameworkCore.MySql.Design" Version="1.1.2" />
     </ItemGroup>
 
 
