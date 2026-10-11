@@ -1,0 +1,126 @@
+@page "/TaskItems"
+@using KidsPointTracker.Shared.Database
+@using KidsPointTracker.Shared.Models
+@using Microsoft.EntityFrameworkCore
+
+<MudPaper>
+    <MudDataGrid @ref="_dataGrid"
+                 T="TaskItem"
+             Items="@_taskItems"
+             ReadOnly="false"
+             EditMode="DataGridEditMode.Inline"
+             EditTrigger="DataGridEditTrigger.Manual"
+             StartedEditingItem="@StartedEditingItem"
+             CanceledEditingItem="@CanceledEditingItem"
+             CommittedItemChanges="@CommittedItemChanges"
+             Bordered="true"
+             Dense="true"
+             Hover="true">
+    <ToolBarContent>
+        <MudText Typo="Typo.h6">Tasks</MudText>
+        <MudSpacer />
+    </ToolBarContent>
+    <Columns>
+        <PropertyColumn Property="x => x.Name" Title="Task">
+            <EditTemplate>
+                <MudTextField @bind-Value="context.Item.Name"
+                              Margin="Margin.Dense"
+                              Required="true"
+                              Immediate="true" />
+            </EditTemplate>
+        </PropertyColumn>
+        <PropertyColumn Property="x => x.PointValue" Title="Point Value">
+            <EditTemplate>
+                <MudNumericField bind-Value="context.Item.PointValue"
+                                 Margin="Margin.Dense" />
+            </EditTemplate>
+        </PropertyColumn>
+        
+        @* Actions column - shows Edit button or Save/Cancel buttons based on edit state *@
+        <TemplateColumn>
+            <CellTemplate>
+                <MudStack Row Spacing="0" Justify="Justify.FlexEnd">
+                    @if (context.IsEditing)
+                    {
+                        <MudIconButton Size="Size.Small"
+                                       Icon="@Icons.Material.Filled.Check"
+                                       Color="Color.Success"
+                                       aria-label="Save changes"
+                                       OnClick="@context.Actions.CommitEditingItemAsync" />
+                        <MudIconButton Size="Size.Small"
+                                       Icon="@Icons.Material.Filled.Close"
+                                       Color="Color.Error"
+                                       aria-label="Cancel editing"
+                                       OnClick="@context.Actions.CancelEditingItemAsync" />
+                    }
+                    else
+                    {
+                        <MudIconButton Size="Size.Small"
+                                       Icon="@Icons.Material.Outlined.Edit"
+                                       Disabled="@_isEditing"
+                                       aria-label="Edit row"
+                                       OnClick="@context.Actions.StartEditingItemAsync" />
+                        <MudIconButton Size="Size.Small"
+                                       Icon="@Icons.Material.Outlined.Delete"
+                                       Disabled="@_isEditing"
+                                       aria-label="Delete row"
+                                       OnClick="@(() => DeleteItem(context.Item))" />
+                    }
+                </MudStack>
+            </CellTemplate>
+        </TemplateColumn>
+    </Columns>
+</MudDataGrid>
+</MudPaper>
+
+@code {
+    
+    private readonly ApplicationDbContext _context;
+    private MudDataGrid<TaskItem> _dataGrid = null!;
+    private List<TaskItem> _taskItems = [];
+    private bool _isEditing;
+
+    public TaskItems(ApplicationDbContext context)
+    {
+        _context = context;
+    }
+    
+    protected override async Task OnInitializedAsync()
+    {
+        _taskItems = await _context.TaskItems.ToListAsync();
+    }
+    
+    private void StartedEditingItem(TaskItem item)
+    {
+        _isEditing = true;
+    }
+
+    private Task<DataGridEditFormAction> CanceledEditingItem(TaskItem item)
+    {
+        _isEditing = false;
+
+        return Task.FromResult(DataGridEditFormAction.Close);
+    }
+
+    private async Task<DataGridEditFormAction> CommittedItemChanges(TaskItem item)
+    {
+        // Perform validation
+        if (string.IsNullOrWhiteSpace(item.Name))
+        {
+            return DataGridEditFormAction.KeepOpen;
+        }
+
+        _context.TaskItems.Add(item);
+        await _context.SaveChangesAsync();
+        
+        _isEditing = false;
+        return DataGridEditFormAction.Close;
+    }
+
+    private async Task DeleteItem(TaskItem item)
+    {
+        _context.TaskItems.Remove(item);
+        await _context.SaveChangesAsync();
+    } 
+
+}
