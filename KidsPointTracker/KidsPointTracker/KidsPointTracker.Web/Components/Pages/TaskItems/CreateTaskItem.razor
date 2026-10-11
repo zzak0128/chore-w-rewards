@@ -1,0 +1,37 @@
+@using KidsPointTracker.Shared.Models
+<MudDialog>
+    <TitleContent>
+        @MudDialog.Title
+    </TitleContent>
+    <DialogContent>
+        <MudForm @ref="@form" @bind-IsValid="@success" @bind-Errors="@errors" OnEnterPressed="ReturnTaskItem">
+            <MudFocusTrap>
+                <MudTextField @bind-Value="NewTaskItem.Name" Label="Task" Required="true" Variant="Variant.Outlined" RequiredError="A name is required for a new Task." />
+                <MudNumericField @bind-Value="NewTaskItem.PointValue" Label="Point Value" Variant="Variant.Outlined" Step="10"/>
+            </MudFocusTrap>
+        </MudForm>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Color="Color.Secondary" OnClick="() => MudDialog.Cancel()" Variant="Variant.Text">Cancel</MudButton>
+        <MudButton Color="Color.Primary" OnClick="ReturnTaskItem" Variant="Variant.Filled">Save</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter]
+    private IMudDialogInstance MudDialog { get; set; } = null!;
+
+    private TaskItem? NewTaskItem { get; set; } = new();
+    private MudForm form = null!;
+    private bool success;
+    private string[] errors = [];
+    
+    private async Task ReturnTaskItem()
+    {
+        await form.ValidateAsync();
+        if (form.IsValid)
+        { 
+            MudDialog.Close(DialogResult.Ok(NewTaskItem));
+        }
+    }
+}
