@@ -16,7 +16,6 @@
              CanceledEditingItem="@CanceledEditingItem"
              CommittedItemChanges="@CommittedItemChanges"
              Bordered="true"
-             Dense="true"
              Hover="true">
         <ToolBarContent>
             <MudStack>
@@ -138,19 +137,29 @@
         {
             return DataGridEditFormAction.KeepOpen;
         }
-
+        
         TaskItem? updateTask = await _context.TaskItems.FindAsync(item.Id);
         if (updateTask is null)
         {
             return DataGridEditFormAction.KeepOpen;
         }
         
-        _context.TaskItems.Update(updateTask);
-        await _context.SaveChangesAsync();
-        
-        _taskItems = await _context.TaskItems.ToListAsync();
+        updateTask.Name = item.Name;
+        updateTask.PointValue = item.PointValue;
+
+        try
+        {
+            _context.TaskItems.Update(updateTask);
+            await _context.SaveChangesAsync();
+        }
+        catch (Exception e)
+        {
+            Snackbar.Add("Failed to Save the Task", Severity.Error);
+        }
         
         _isEditing = false;
+        _taskItems = await _context.TaskItems.ToListAsync();
+
         return DataGridEditFormAction.Close;
     }
 
