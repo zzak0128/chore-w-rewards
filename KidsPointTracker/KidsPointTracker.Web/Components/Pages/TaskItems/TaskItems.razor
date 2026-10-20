@@ -1,9 +1,11 @@
 @page "/TaskItems"
 @using KidsPointTracker.Shared.Database
 @using KidsPointTracker.Shared.Models
+@using KidsPointTracker.Shared.Services
 @using Microsoft.EntityFrameworkCore
 @inject ISnackbar Snackbar
 @inject IDialogService DialogService 
+@inject TaskService TaskService
 
 <MudPaper>
     <MudDataGrid @ref="_dataGrid"
@@ -91,7 +93,7 @@
     
     protected override async Task OnInitializedAsync()
     {
-        _taskItems = await _context.TaskItems.ToListAsync();
+        _taskItems = await TaskService.GetTasksAsync();
     }
     
     private async Task CreateTaskItem()
@@ -105,11 +107,9 @@
             if (newTaskItem is not null)
             {
                 createDialog.Close();
-
-                _context.TaskItems.Add(newTaskItem);
-                await _context.SaveChangesAsync();
                 
-                _taskItems = await _context.TaskItems.ToListAsync();
+                await TaskService.CreateTaskItemAsync(newTaskItem);
+                _taskItems = await TaskService.GetTasksAsync();
             }
             else
             {
@@ -138,35 +138,26 @@
             return DataGridEditFormAction.KeepOpen;
         }
         
-        TaskItem? updateTask = await _context.TaskItems.FindAsync(item.Id);
-        if (updateTask is null)
-        {
-            return DataGridEditFormAction.KeepOpen;
-        }
-        
-        updateTask.Name = item.Name;
-        updateTask.PointValue = item.PointValue;
-
         try
         {
-            _context.TaskItems.Update(updateTask);
-            await _context.SaveChangesAsync();
+            await TaskService.UpdateTaskItemAsync(item);
         }
         catch (Exception e)
         {
             Snackbar.Add("Failed to Save the Task", Severity.Error);
+            
+            return DataGridEditFormAction.KeepOpen;
         }
         
         _isEditing = false;
-        _taskItems = await _context.TaskItems.ToListAsync();
+        _taskItems = await TaskService.GetTasksAsync();
 
         return DataGridEditFormAction.Close;
     }
 
     private async Task DeleteItem(TaskItem item)
     {
-        _context.TaskItems.Remove(item);
-        await _context.SaveChangesAsync();
+        await TaskService.DeleteTaskItemAsync(item);
         
         _taskItems.Remove(item);
     } 

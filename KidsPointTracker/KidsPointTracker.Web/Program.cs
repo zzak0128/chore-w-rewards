@@ -1,4 +1,5 @@
 using KidsPointTracker.Shared.Database;
+using KidsPointTracker.Shared.Services;
 using KidsPointTracker.Web.Components;
 using Microsoft.EntityFrameworkCore;
 using MudBlazor.Services;
@@ -16,6 +17,9 @@ var connectionString = builder.Configuration.GetConnectionString("Default") ?? t
 builder.Services.AddDbContextFactory<ApplicationDbContext>(options =>
     options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
 
+builder.Services.AddScoped<TaskService>();
+builder.Services.AddScoped<RewardService>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -29,8 +33,6 @@ if (!app.Environment.IsDevelopment())
 app.UseStatusCodePagesWithReExecute("/not-found", createScopeForStatusCodePages: true);
 
 app.UseHttpsRedirection();
-
-
 app.UseAntiforgery();
 
 app.MapStaticAssets();
