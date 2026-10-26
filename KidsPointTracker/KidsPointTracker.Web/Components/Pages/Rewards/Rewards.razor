@@ -81,15 +81,9 @@
 </MudPaper>
 
 @code {
-    private readonly ApplicationDbContext _context;
     private MudDataGrid<Reward> _dataGrid = null!;
     private List<Reward> _rewards = [];
     private bool _isEditing;
-
-    public Rewards(ApplicationDbContext context)
-    {
-        _context = context;
-    }
     
     protected override async Task OnInitializedAsync()
     {

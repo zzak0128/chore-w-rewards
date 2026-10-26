@@ -1,8 +1,6 @@
 @page "/TaskItems"
-@using KidsPointTracker.Shared.Database
 @using KidsPointTracker.Shared.Models
 @using KidsPointTracker.Shared.Services
-@using Microsoft.EntityFrameworkCore
 @inject ISnackbar Snackbar
 @inject IDialogService DialogService 
 @inject TaskService TaskService
@@ -81,15 +79,9 @@
 </MudPaper>
 
 @code {
-    private readonly ApplicationDbContext _context;
     private MudDataGrid<TaskItem> _dataGrid = null!;
     private List<TaskItem> _taskItems = [];
     private bool _isEditing;
-
-    public TaskItems(ApplicationDbContext context)
-    {
-        _context = context;
-    }
     
     protected override async Task OnInitializedAsync()
     {

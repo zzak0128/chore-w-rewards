@@ -39,6 +39,9 @@
 </MudPaper>
 
 @code {
+    [Parameter]
+    public EventCallback OnSave { get; set; }
+    
     private List<TaskItem> _taskItems = [];
     private TaskItem _selectedTaskItem = new TaskItem();
     private List<User> _users = [];
@@ -69,5 +72,6 @@
     private async Task SaveTaskItemAsync()
     {
         await HistoryService.SaveHistoryAsync(_selectedUser, _selectedTaskItem);
+        await OnSave.InvokeAsync();
     }
 }

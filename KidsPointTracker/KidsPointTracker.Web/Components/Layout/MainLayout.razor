@@ -12,9 +12,9 @@
         <MudIconButton Icon="@(DarkLightModeButtonIcon)" Color="Color.Inherit" OnClick="@DarkModeToggle"/>
         <MudIconButton Icon="@Icons.Material.Filled.Add" OnClick="@ToggleOpenPopover"/>
         
-        <MudPopover Open="@_openPopover" Fixed="true" Class="px-4 pt-4">
+        <MudPopover Open="@_openPopover" Fixed="true" Class="px-4 pt-4"> 
             <div class="d-flex flex-column">
-                <TrackTaskItem />
+                <TrackTaskItem OnSave="ToggleOpenPopover" />
                 <MudButton OnClick="@ToggleOpenPopover" Class="ml-auto mr-n3 mb-1" Color="Color.Error">Close</MudButton>
             </div>
         </MudPopover>

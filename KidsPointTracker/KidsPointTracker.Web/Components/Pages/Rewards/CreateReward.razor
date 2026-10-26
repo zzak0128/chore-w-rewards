@@ -4,11 +4,11 @@
         @MudDialog.Title
     </TitleContent>
     <DialogContent>
-        <MudForm @ref="@form" @bind-IsValid="@success" @bind-Errors="@errors" OnEnterPressed="ReturnReward">
+        <MudForm @ref="@_form" @bind-IsValid="@_success" @bind-Errors="@_errors" OnEnterPressed="ReturnReward">
             <MudFocusTrap>
-                <MudTextField @bind-Value="newReward.Name" Label="Reward" Required="true" Variant="Variant.Outlined"
+                <MudTextField @bind-Value="NewReward?.Name" Label="Reward" Required="true" Variant="Variant.Outlined"
                               RequiredError="A name is required for a new Reward."/>
-                <MudNumericField @bind-Value="newReward.PointValue" Label="Point Value" Variant="Variant.Outlined"
+                <MudNumericField @bind-Value="NewReward?.PointValue" Label="Point Value" Variant="Variant.Outlined"
                                  Step="10"/>
             </MudFocusTrap>
         </MudForm>
@@ -22,17 +22,17 @@
 @code {
     [CascadingParameter] private IMudDialogInstance MudDialog { get; set; } = null!;
 
-    private Reward? newReward { get; } = new();
-    private MudForm form = null!;
-    private bool success;
-    private string[] errors = [];
+    private Reward? NewReward { get; } = new();
+    private MudForm _form = null!;
+    private bool _success;
+    private string[] _errors = [];
 
     private async Task ReturnReward()
     {
-        await form.ValidateAsync();
-        if (form.IsValid)
+        await _form.ValidateAsync();
+        if (_form.IsValid)
         {
-            MudDialog.Close(DialogResult.Ok(newReward));
+            MudDialog.Close(DialogResult.Ok(NewReward));
         }
     }
 

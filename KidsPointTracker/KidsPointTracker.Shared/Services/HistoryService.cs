@@ -21,6 +21,8 @@ public class HistoryService
 
     public async Task SaveHistoryAsync(User user, TaskItem taskItem)
     {
+        var context = await _contextFactory.CreateDbContextAsync();
+        context.Attach(user);
         History newHistory = new()
         {
             User = user,
@@ -28,7 +30,6 @@ public class HistoryService
             PointValue =  taskItem.PointValue,
         };
         
-        var context = await _contextFactory.CreateDbContextAsync();
         context.Histories.Add(newHistory);
         await context.SaveChangesAsync();
     }

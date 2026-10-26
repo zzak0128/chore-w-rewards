@@ -1,9 +1,159 @@
 @page "/Users"
+@using KidsPointTracker.Shared
+@using KidsPointTracker.Shared.Models
 @using KidsPointTracker.Shared.Services
+@inject IDialogService DialogService
+@inject ISnackbar Snackbar
 @inject UserService UserService
 
-<h3>UserList</h3>
+<MudPaper>
+    <MudDataGrid @ref="_dataGrid"
+                 T="User"
+             Items="@_users"
+             ReadOnly="false"
+             EditMode="DataGridEditMode.Inline"
+             EditTrigger="DataGridEditTrigger.Manual"
+             StartedEditingItem="@StartedEditingItem"
+             CanceledEditingItem="@CanceledEditingItem"
+             CommittedItemChanges="@CommittedItemChanges"
+             Bordered="true"
+             Hover="true">
+        <ToolBarContent>
+            <MudStack Justify="Justify.SpaceBetween">
+                <MudText Typo="Typo.h6">Users</MudText>
+                <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="CreateUserAsync" StartIcon="@Icons.Material.Filled.Add">Add New</MudButton>
+            </MudStack>
+        </ToolBarContent>
+    <Columns>
+        <PropertyColumn Property="x => x.Name" Title="User">
+            <EditTemplate>
+                <MudTextField @bind-Value="context.Item.Name"
+                              Margin="Margin.Dense"
+                              Required="true"
+                              Immediate="true" />
+            </EditTemplate>
+        </PropertyColumn>
+        <PropertyColumn Property="x => x.UserType" Title="User Type">
+            <EditTemplate>
+                <MudSelect @bind-Value="context.Item.UserType">
+                    @foreach (var type in Enum.GetValues(typeof(UserType)).Cast<UserType>())
+                    {
+                        <MudSelectItem Value="@type">@type</MudSelectItem>
+                    }
+                </MudSelect>
+            </EditTemplate>
+        </PropertyColumn>
+        
+        @* Actions column - shows Edit button or Save/Cancel buttons based on edit state *@
+        <TemplateColumn>
+            <CellTemplate>
+                <MudStack Row Spacing="0" Justify="Justify.FlexEnd">
+                    @if (context.IsEditing)
+                    {
+                        <MudIconButton Size="Size.Small"
+                                       Icon="@Icons.Material.Filled.Check"
+                                       Color="Color.Success"
+                                       aria-label="Save changes"
+                                       OnClick="@context.Actions.CommitEditingItemAsync" />
+                        <MudIconButton Size="Size.Small"
+                                       Icon="@Icons.Material.Filled.Close"
+                                       Color="Color.Error"
+                                       aria-label="Cancel editing"
+                                       OnClick="@context.Actions.CancelEditingItemAsync" />
+                    }
+                    else
+                    {
+                        <MudIconButton Size="Size.Small"
+                                       Icon="@Icons.Material.Outlined.Edit"
+                                       Disabled="@_isEditing"
+                                       aria-label="Edit row"
+                                       OnClick="@context.Actions.StartEditingItemAsync" />
+                        <MudIconButton Size="Size.Small"
+                                       Icon="@Icons.Material.Outlined.Delete"
+                                       Disabled="@_isEditing"
+                                       aria-label="Delete row"
+                                       OnClick="@(() => DeleteItem(context.Item))" />
+                    }
+                </MudStack>
+            </CellTemplate>
+        </TemplateColumn>
+    </Columns>
+</MudDataGrid>
+</MudPaper>
 
 @code {
+    private MudDataGrid<User> _dataGrid = null!;
+    private List<User> _users = [];
+    private bool _isEditing;
     
+    protected override async Task OnInitializedAsync()
+    {
+        _users = await UserService.GetUsersAsync();
+    }
+    
+    private async Task CreateUserAsync()
+    {
+        var createDialog = await DialogService.ShowAsync<CreateUser>("Add a new User");
+
+        var result = await createDialog.Result;
+        if (!result!.Canceled)
+        {
+            var newUser = await createDialog.GetReturnValueAsync<User>();
+            if (newUser is not null)
+            {
+                createDialog.Close();
+                
+                await UserService.CreateUserAsync(newUser);
+                _users = await UserService.GetUsersAsync();
+            }
+            else
+            {
+                Snackbar.Add("Failed to Save the new User", Severity.Error);
+            }
+        }
+    }
+    
+    private void StartedEditingItem(User item)
+    {
+        _isEditing = true;
+    }
+
+    private Task<DataGridEditFormAction> CanceledEditingItem(User item)
+    {
+        _isEditing = false;
+
+        return Task.FromResult(DataGridEditFormAction.Close);
+    }
+
+    private async Task<DataGridEditFormAction> CommittedItemChanges(User item)
+    {
+        // Perform validation
+        if (string.IsNullOrWhiteSpace(item.Name))
+        {
+            return DataGridEditFormAction.KeepOpen;
+        }
+        
+        try
+        {
+            await UserService.UpdateUserAsync(item);
+        }
+        catch (Exception e)
+        {
+            Snackbar.Add("Failed to Save the User", Severity.Error);
+            
+            return DataGridEditFormAction.KeepOpen;
+        }
+        
+        _isEditing = false;
+        _users = await UserService.GetUsersAsync();
+
+        return DataGridEditFormAction.Close;
+    }
+
+    private async Task DeleteItem(User item)
+    {
+        await UserService.DeleteUserAsync(item);
+        
+        _users.Remove(item);
+    } 
 }

@@ -19,15 +19,45 @@ public class UserService
         return await context.Users.OrderBy(x => x.Name).ToListAsync();
     }
 
-    public async Task SaveUserAsync(string name, UserType userType)
+    public async Task CreateUserAsync(string name, UserType userType)
     {
         var context = await _contextFactory.CreateDbContextAsync();
-        User newUser = new User
+        var newUser = new User
         {
             Name = name,
             UserType = userType
         };
         context.Users.Add(newUser);
+        await context.SaveChangesAsync();
+    }
+
+    public async Task CreateUserAsync(User user)
+    {
+        var context = await _contextFactory.CreateDbContextAsync();
+        context.Users.Add(user);
+        await context.SaveChangesAsync();
+    }
+
+    public async Task UpdateUserAsync(User user)
+    {
+        var context = await _contextFactory.CreateDbContextAsync();
+        var updateUser = await context.Users.FindAsync(user.Id);
+        if (updateUser is null)
+        {
+            throw new Exception("User not found");
+        }
+
+        updateUser.Name = user.Name;
+        updateUser.UserType = user.UserType;
+        context.Users.Update(updateUser);
+
+        await context.SaveChangesAsync();
+    }
+
+    public async Task DeleteUserAsync(User item)
+    {
+        var context = await _contextFactory.CreateDbContextAsync();
+        context.Users.Remove(item);
         await context.SaveChangesAsync();
     }
 }
