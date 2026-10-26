@@ -1,0 +1,73 @@
+@using KidsPointTracker.Shared.Models
+@using KidsPointTracker.Shared.Services
+@inject TaskService TaskService
+@inject UserService UserService
+@inject HistoryService HistoryService
+<h3>TrackTaskItem</h3>
+
+<MudPaper>
+    <MudStack>
+        <MudForm>
+            <MudAutocomplete T="User"
+                             @bind-Value="_selectedUser"
+                             ToStringFunc="@(x=> x?.Name)"
+                             SearchFunc="SearchUsers"
+                             Placeholder="Select a User"
+                             Dense="true"
+                             Clearable="true" />
+            
+            <MudAutocomplete T="TaskItem"
+                             @bind-Value="_selectedTaskItem"
+                             ToStringFunc="@(x=> x?.Name)"
+                             SearchFunc="SearchTasks"
+                             Placeholder="Select a Task"
+                             Dense="true"
+                             Clearable="true" />
+        </MudForm>
+        <MudStack Row="true">
+            <div>
+                @if (_selectedTaskItem != null)
+                 {
+                    @_selectedTaskItem.Name
+                    @_selectedTaskItem.PointValue
+                 }
+            </div>
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="SaveTaskItemAsync">Save</MudButton>
+
+        </MudStack>
+    </MudStack>
+</MudPaper>
+
+@code {
+    private List<TaskItem> _taskItems = [];
+    private TaskItem _selectedTaskItem = new TaskItem();
+    private List<User> _users = [];
+    private User _selectedUser = new User();
+    
+    private async Task<IEnumerable<TaskItem>>? SearchTasks(string? value, CancellationToken token)
+    {
+        _taskItems = await TaskService.GetTasksAsync();
+        if (string.IsNullOrEmpty(value))
+        {
+            return _taskItems;
+        }
+
+        return _taskItems.Where(x => x.Name.Contains(value, StringComparison.InvariantCultureIgnoreCase));
+    }
+    
+    private async Task<IEnumerable<User>>? SearchUsers(string? value, CancellationToken token)
+    {
+        _users = await UserService.GetUsersAsync();
+        if (string.IsNullOrEmpty(value))
+        {
+            return _users;
+        }
+
+        return _users.Where(x => x.Name.Contains(value, StringComparison.InvariantCultureIgnoreCase));
+    }
+
+    private async Task SaveTaskItemAsync()
+    {
+        await HistoryService.SaveHistoryAsync(_selectedUser, _selectedTaskItem);
+    }
+}

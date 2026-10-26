@@ -19,6 +19,8 @@ builder.Services.AddDbContextFactory<ApplicationDbContext>(options =>
 
 builder.Services.AddScoped<TaskService>();
 builder.Services.AddScoped<RewardService>();
+builder.Services.AddScoped<UserService>();
+builder.Services.AddScoped<HistoryService>();
 
 var app = builder.Build();
 

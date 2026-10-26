@@ -6,5 +6,5 @@ public class User
 
     public string Name { get; set; } = null!;
 
-    public UserType UserType { get; set; }
+    public UserType UserType { get; set; } = UserType.Child;
 }

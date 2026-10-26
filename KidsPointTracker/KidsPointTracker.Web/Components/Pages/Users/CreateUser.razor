@@ -1,0 +1,49 @@
+@using KidsPointTracker.Shared
+@using KidsPointTracker.Shared.Models
+
+<MudDialog>
+    <TitleContent>
+        @MudDialog.Title
+    </TitleContent>
+    <DialogContent>
+        <MudForm @ref="@form" OnEnterPressed="ReturnUser">
+         <MudFocusTrap>
+                 <MudTextField @bind-Value="@NewUser.Name" 
+                 Label="Task" 
+                 Required="true" 
+                 Variant="Variant.Outlined" 
+                 RequiredError="A name is required for a new User." />
+        
+        <MudSelect T="UserType" 
+                   bind-Value="@NewUser.UserType"
+                   Dense="true">
+            @foreach (var type in Enum.GetValues(typeof(UserType)).Cast<UserType>())
+            {
+                <MudSelectItem Value="@type">@type</MudSelectItem>
+            }
+        </MudSelect>
+            </MudFocusTrap>
+        </MudForm>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Color="Color.Secondary" OnClick="() => MudDialog.Cancel()" Variant="Variant.Text">Cancel</MudButton>
+        <MudButton Color="Color.Primary" OnClick="ReturnUser" Variant="Variant.Filled">Save</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter]
+    private IMudDialogInstance MudDialog { get; set; } = null!;
+
+    private User? NewUser { get; set; } = new();
+    private MudForm form = null!;
+    
+    private async Task ReturnUser()
+    {
+        await form.ValidateAsync();
+        if (form.IsValid)
+        { 
+            MudDialog.Close(DialogResult.Ok(NewUser));
+        }
+    }
+}
