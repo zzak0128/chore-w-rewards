@@ -18,7 +18,7 @@
             
             <MudAutocomplete T="TaskItem"
                              @bind-Value="_selectedTaskItem"
-                             ToStringFunc="@(x=> x?.Name)"
+                             ToStringFunc="@(e=> e?.Name is null ? null : $"{e.Name} ({e.PointValue})")"
                              SearchFunc="SearchTasks"
                              Placeholder="Select a Task"
                              Dense="true"
@@ -73,5 +73,10 @@
     {
         await HistoryService.SaveHistoryAsync(_selectedUser, _selectedTaskItem);
         await OnSave.InvokeAsync();
+    }
+
+    private string ToStringFunc(TaskItem taskItem)
+    {
+        return $"{taskItem.Name} -- {taskItem.PointValue}";
     }
 }

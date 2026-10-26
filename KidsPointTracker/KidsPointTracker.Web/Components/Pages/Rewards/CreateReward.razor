@@ -6,9 +6,9 @@
     <DialogContent>
         <MudForm @ref="@_form" @bind-IsValid="@_success" @bind-Errors="@_errors" OnEnterPressed="ReturnReward">
             <MudFocusTrap>
-                <MudTextField @bind-Value="NewReward?.Name" Label="Reward" Required="true" Variant="Variant.Outlined"
+                <MudTextField @bind-Value="NewReward.Name" Label="Reward" Required="true" Variant="Variant.Outlined"
                               RequiredError="A name is required for a new Reward."/>
-                <MudNumericField @bind-Value="NewReward?.PointValue" Label="Point Value" Variant="Variant.Outlined"
+                <MudNumericField @bind-Value="NewReward.PointValue" Label="Point Value" Variant="Variant.Outlined"
                                  Step="10"/>
             </MudFocusTrap>
         </MudForm>

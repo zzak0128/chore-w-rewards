@@ -21,6 +21,7 @@ builder.Services.AddScoped<TaskService>();
 builder.Services.AddScoped<RewardService>();
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<HistoryService>();
+builder.Services.AddScoped<DashboardService>();
 
 var app = builder.Build();
 
