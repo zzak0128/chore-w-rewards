@@ -5,8 +5,10 @@
 
 <PageTitle>Home</PageTitle>
 
-<h3>Home</h3>
-<MudButton OnClick="RefreshDataAsync" Variant="Variant.Filled" Color="Color.Primary">Refresh</MudButton>
+<MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Baseline">
+    <MudText Typo="Typo.h2">Home</MudText>
+    <MudButton OnClick="RefreshDataAsync" StartIcon="@Icons.Material.Filled.Refresh" Variant="Variant.Filled" Color="Color.Primary">Refresh</MudButton>
+</MudStack>
 <MudContainer Class="mt-16 px-8" MaxWidth="MaxWidth.False">
     <MudGrid>
         @foreach (var item in _dashboardItems)

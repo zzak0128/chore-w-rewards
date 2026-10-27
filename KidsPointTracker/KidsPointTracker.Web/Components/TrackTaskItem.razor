@@ -10,43 +10,39 @@
         <MudForm>
             <MudAutocomplete T="User"
                              @bind-Value="_selectedUser"
-                             ToStringFunc="@(x=> x?.Name)"
+                             ToStringFunc="@(x => x?.Name)"
                              SearchFunc="SearchUsers"
                              Placeholder="Select a User"
                              Dense="true"
-                             Clearable="true" />
-            
+                             Clearable="true"/>
+
             <MudAutocomplete T="TaskItem"
                              @bind-Value="_selectedTaskItem"
-                             ToStringFunc="@(e=> e?.Name is null ? null : $"{e.Name} ({e.PointValue})")"
+                             ToStringFunc="@(e => ToDropdownString(e))"
                              SearchFunc="SearchTasks"
                              Placeholder="Select a Task"
                              Dense="true"
-                             Clearable="true" />
+                             Clearable="true"/>
         </MudForm>
-        <MudStack Row="true">
-            <div>
-                @if (_selectedTaskItem != null)
-                 {
-                    @_selectedTaskItem.Name
-                    @_selectedTaskItem.PointValue
-                 }
-            </div>
-            <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="SaveTaskItemAsync">Save</MudButton>
-
+        <MudStack Row="true" Justify="Justify.Center" AlignItems="AlignItems.Center">
+            @if (!string.IsNullOrEmpty(_selectedTaskItem?.Name))
+            {
+                <MudChip T="string" Color="Color.Secondary" Value="@_selectedTaskItem.Name"/>
+                <MudChip T="int" Color="Color.Tertiary" Value="_selectedTaskItem.PointValue"/>
+            }
         </MudStack>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="SaveTaskItemAsync">Save</MudButton>
     </MudStack>
 </MudPaper>
 
 @code {
-    [Parameter]
-    public EventCallback OnSave { get; set; }
-    
+    [Parameter] public EventCallback OnSave { get; set; }
+
     private List<TaskItem> _taskItems = [];
     private TaskItem _selectedTaskItem = new TaskItem();
     private List<User> _users = [];
     private User _selectedUser = new User();
-    
+
     private async Task<IEnumerable<TaskItem>>? SearchTasks(string? value, CancellationToken token)
     {
         _taskItems = await TaskService.GetTasksAsync();
@@ -57,7 +53,7 @@
 
         return _taskItems.Where(x => x.Name.Contains(value, StringComparison.InvariantCultureIgnoreCase));
     }
-    
+
     private async Task<IEnumerable<User>>? SearchUsers(string? value, CancellationToken token)
     {
         _users = await UserService.GetUsersAsync();
@@ -75,8 +71,14 @@
         await OnSave.InvokeAsync();
     }
 
-    private string ToStringFunc(TaskItem taskItem)
+    private string? ToDropdownString(TaskItem? taskItem)
     {
-        return $"{taskItem.Name} -- {taskItem.PointValue}";
+        if (taskItem is null)
+        {
+            return null;
+        }
+
+        return string.IsNullOrEmpty(taskItem.Name) ? null : $"{taskItem.Name} -- {taskItem.PointValue} Points";
     }
+
 }

@@ -6,16 +6,20 @@
 <MudSnackbarProvider/>
 <MudLayout>
     <MudAppBar Elevation="1">
-        <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())"/>
+        <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start"
+                       OnClick="@((e) => DrawerToggle())"/>
         <MudText Typo="Typo.h5" Class="ml-3">Application</MudText>
         <MudSpacer/>
         <MudIconButton Icon="@(DarkLightModeButtonIcon)" Color="Color.Inherit" OnClick="@DarkModeToggle"/>
         <MudIconButton Icon="@Icons.Material.Filled.Add" OnClick="@ToggleOpenPopover"/>
-        
-        <MudPopover Open="@_openPopover" Fixed="true" Class="px-4 pt-4"> 
+
+        <MudPopover Open="@_openPopover" Class="px-4 pt-4">
             <div class="d-flex flex-column">
-                <TrackTaskItem OnSave="ToggleOpenPopover" />
-                <MudButton OnClick="@ToggleOpenPopover" Class="ml-auto mr-n3 mb-1" Color="Color.Error">Close</MudButton>
+                <MudFocusTrap>
+                    <TrackTaskItem OnSave="ToggleOpenPopover"/>
+                    <MudButton OnClick="@ToggleOpenPopover" Class="ml-auto mr-n3 mb-1" Color="Color.Error">Close
+                    </MudButton>
+                </MudFocusTrap>
             </div>
         </MudPopover>
         @* <MudIconButton Icon="@Icons.Material.Filled.MoreVert" Color="Color.Inherit" Edge="Edge.End"/> *@
@@ -52,7 +56,7 @@
             LayoutProperties = new LayoutProperties()
         };
     }
-    
+
     private void ToggleOpenPopover() => _openPopover = !_openPopover;
 
     private void DrawerToggle()
